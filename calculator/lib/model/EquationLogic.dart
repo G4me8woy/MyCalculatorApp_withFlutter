@@ -1,3 +1,4 @@
+import 'package:calculator/model/AnswerLogic.dart';
 import 'package:flutter/material.dart';
 
 class EquationLogic extends ChangeNotifier {
@@ -10,6 +11,8 @@ class EquationLogic extends ChangeNotifier {
   num answer = 0;
 
   var numberProperties = new List();
+
+  AnswerLogic ans = new AnswerLogic();
 
   void equationUpdate(String input) {
     if (lastChar == null) {
@@ -48,6 +51,7 @@ class EquationLogic extends ChangeNotifier {
             print(
                 "isNegative: ${obj.isNegative}   isDecimal: ${obj.isDecimal}");
           }
+          ans.calcProcess(displayEquation);
           break;
         default:
           displayEquation += input;
