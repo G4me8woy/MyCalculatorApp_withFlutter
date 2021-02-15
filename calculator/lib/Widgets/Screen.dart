@@ -1,3 +1,4 @@
+import 'package:calculator/model/AnswerLogic.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../model/EquationLogic.dart';
@@ -9,7 +10,7 @@ class Screen extends StatelessWidget {
 
   Screen(this.inheritedContext);
   @override
-  Widget build(inheritedContext) {
+  Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,

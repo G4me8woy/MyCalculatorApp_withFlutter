@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class Keypad extends StatelessWidget {
-  final BuildContext inheritContext;
+  // final BuildContext inheritContext;
 
-  Keypad(this.inheritContext);
+  // Keypad(this.inheritContext);
 
   @override
   Widget build(inheritContext) {

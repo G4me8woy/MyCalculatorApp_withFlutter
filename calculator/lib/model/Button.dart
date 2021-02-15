@@ -1,14 +1,27 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'AnswerLogic.dart';
 import 'EquationLogic.dart';
 
 class Button {}
 
 Widget buildButton(String value, BuildContext context) => GestureDetector(
       onTap: () {
-        var display = context.read<EquationLogic>();
-        display.equationUpdate(value);
+        var equation = context.read<EquationLogic>();
+        var answer = context.read<AnswerLogic>();
+
+        switch (value) {
+          case "=":
+            answer.calcProcess(equation.displayEquation);
+            break;
+          // case "C":
+          //   answer.calcProcess(equation.displayEquation);
+          // break;
+          default:
+            equation.equationUpdate(value);
+            answer.calcProcess(equation.displayEquation);
+        }
       },
       child: Container(
         height: 70,

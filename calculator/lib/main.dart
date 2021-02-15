@@ -3,20 +3,29 @@ import 'package:provider/provider.dart';
 
 import 'Widgets/Screen.dart';
 import 'Widgets/Keypad.dart';
+import 'model/AnswerLogic.dart';
 import 'model/EquationLogic.dart';
 
 void main() => runApp(
-      ChangeNotifierProvider(
-        // Initialize the model in the builder. That way, Provider
-        // can own Counter's lifecycle, making sure to call `dispose`
-        // when not needed anymore.
-        create: (context) => EquationLogic(),
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (_) => EquationLogic(),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => AnswerLogic(),
+          ),
+        ],
         child: MaterialApp(
           home: Calc(),
-          // home: Test(),
           debugShowCheckedModeBanner: false,
         ),
       ),
+
+      // MaterialApp(
+      //   home: Calc(),
+      //   debugShowCheckedModeBanner: false,
+      // ),
     );
 
 class Calc extends StatelessWidget {
@@ -31,10 +40,9 @@ class Calc extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Consumer<EquationLogic>(
-              builder: (context, display, child) => Screen(context)),
+          Screen(context),
           Expanded(
-            child: Keypad(context),
+            child: Keypad(),
           ),
         ],
       ),

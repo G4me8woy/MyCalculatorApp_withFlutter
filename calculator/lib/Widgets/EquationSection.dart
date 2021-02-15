@@ -9,13 +9,14 @@ class EquationSection extends StatelessWidget {
 
   @override
   Widget build(inheritedContext) {
-    return Container(
-      width: MediaQuery.of(inheritedContext).size.width,
-      // decoration: BoxDecoration(border: Border.all(width: 1)),
-      child: Text(
-        inheritedContext.read<EquationLogic>().displayEquation,
-        // inheritedContext.read<Logic>().test,
-        style: TextStyle(fontSize: 20),
+    return Consumer<EquationLogic>(
+      builder: (inheritedContext, display, child) => Container(
+        width: MediaQuery.of(inheritedContext).size.width,
+        child: Text(
+          inheritedContext.read<EquationLogic>().displayEquation,
+          // inheritedContext.read<Logic>().test,
+          style: TextStyle(fontSize: 20),
+        ),
       ),
     );
   }

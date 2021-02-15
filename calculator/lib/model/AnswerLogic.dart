@@ -1,22 +1,75 @@
 import 'package:flutter/foundation.dart';
 
-class AnswerLogic {
+class AnswerLogic extends ChangeNotifier {
   String equation;
-  int oppNum = 0;
-  var eqnParts = new List();
 
-  void calcProcess(String equation) {
-    this.equation = equation;
-    bracketPrecedence();
-    eqnPrecedence();
+  var eqnParts = new List();
+  var steps = new List();
+  var braceInd = new List();
+
+  String answer = "...";
+
+  int oppNum = 0;
+  int eqnStartInd;
+  int eqnEndInd;
+
+  void calcProcess(String givenEquation) {
+    eqnParts = [];
+    braceInd = [];
+    steps = [];
+    oppNum = 0;
+    eqnStartInd = null;
+    eqnEndInd = null;
+    this.equation = givenEquation;
+    try {
+      bracketPrecedence();
+    } catch (e) {
+      answer = "...";
+      notifyListeners();
+    }
+
+    // if (braceInd.length > 0) {
+    //   for (var indexGroup in braceInd) {
+    //     eqnParts = [];
+    //     eqnLog(indexGroup.startInd, indexGroup.closeInd);
+    //   }
+    // } else {
+    //   eqnLog(0, equation.length - 1);
+    // }
   }
 
   void bracketPrecedence() {
     for (int eqnInd = 0; eqnInd < equation.length; eqnInd++) {
-      if (equation[eqnInd] != ")") continue;
+      eqnParts = [];
+      oppNum = 0;
+      if (eqnInd == equation.length - 1 && equation[eqnInd] != ")") {
+        eqnStartInd = 0;
+        eqnEndInd = equation.length - 1;
+        eqnLog(eqnStartInd, eqnEndInd);
+        answer = equation;
+        notifyListeners();
+        break;
+      }
 
+      if (equation[eqnInd] != ")") continue;
+      // int searchInd;
+      // if (braceInd.length == 0)
+      //   searchInd = eqnInd - 2;
+      // else
+      //   searchInd = braceInd[braceInd.length - 1].startInd - 2;
       for (int searchInd = eqnInd - 2; searchInd >= 0; searchInd--) {
-        if (equation[searchInd] == "(") eqnLog(searchInd, eqnInd);
+        if (equation[searchInd] == "(") {
+          // openBracketInd = searchInd;
+          // closeBracketInd = eqnInd;
+
+          eqnStartInd = searchInd + 1;
+          eqnEndInd = eqnInd - 1;
+
+          eqnLog(eqnStartInd, eqnEndInd);
+
+          eqnInd = 0;
+          break;
+        }
       }
     }
   }
@@ -24,7 +77,7 @@ class AnswerLogic {
   void eqnLog(int startInd, int endInd) {
     String tempNum;
 
-    for (var i = 0; i < equation.length; i++) {
+    for (var i = startInd; i <= endInd; i++) {
       //if an opperator (except (-)) is detected
       if (equation[i] == "+" || equation[i] == "*" || equation[i] == "/") {
         eqnParts.add(tempNum);
@@ -49,6 +102,7 @@ class AnswerLogic {
           oppNum++;
         }
       } // number
+
       else {
         if (tempNum == null)
           tempNum = equation[i];
@@ -57,39 +111,40 @@ class AnswerLogic {
       }
 
       //on last num char
-      if (i == equation.length - 1) {
+      if (i == endInd) {
         eqnParts.add(tempNum);
         tempNum = null;
       }
     }
+    eqnPrecedence();
   }
 
   void eqnPrecedence() {
     for (int a = 1; a <= oppNum; a++) {
-      for (var b = 0; b < equation.length; b++) {
-        switch (equation[b]) {
+      for (var b = 0; b < eqnParts.length - 1; b++) {
+        switch (eqnParts[b]) {
           case "/":
-            compute(equation[b], b);
+            compute(eqnParts[b], b);
             break;
           case "*":
-            compute(equation[b], b);
+            compute(eqnParts[b], b);
             break;
           case "+":
-            compute(equation[b], b);
+            compute(eqnParts[b], b);
             break;
           case "-":
-            compute(equation[b], b);
+            compute(eqnParts[b], b);
             break;
-          default:
         }
+        // b = 0;
       }
     }
   }
 
   void compute(String opp, int oppInd) {
-    num num1 = decimalCheck(equation[oppInd - 1]);
+    num num1 = decimalCheck(eqnParts[oppInd - 1]);
 
-    num num2 = decimalCheck(equation[oppInd - 1]);
+    num num2 = decimalCheck(eqnParts[oppInd + 1]);
 
     num result;
 
@@ -108,7 +163,9 @@ class AnswerLogic {
         break;
     }
 
-    eqnUpdate(oppInd, result);
+    eqnPartsUpdate(oppInd, result);
+    equationUpate(result);
+    stepsUpdate();
   }
 
   num decimalCheck(String number) {
@@ -118,7 +175,30 @@ class AnswerLogic {
       return int.parse(number);
   }
 
-  void eqnUpdate(int oppInd, num result) {
-    eqnParts.replaceRange(oppInd - 1, oppInd + 2, [result]);
+  void eqnPartsUpdate(int oppInd, num result) {
+    eqnParts.replaceRange(oppInd - 1, oppInd + 2, [result.toString()]);
   }
+
+  void equationUpate(num result) {
+    // equation.replaceRange(
+    //     braceInd[0].startInd - 1, braceInd[0].closeInd + 2, result.toString());
+
+    if (eqnStartInd == 0)
+      equation = result.toString();
+    else
+      equation = equation.substring(0, eqnStartInd - 1) +
+          result.toString() +
+          equation.substring(eqnEndInd + 2, equation.length);
+
+    // braceInd.removeAt(0);
+  }
+
+  void stepsUpdate() {
+    steps.add(equation);
+  }
+}
+
+class BraceIndex {
+  int startInd;
+  int closeInd;
 }
